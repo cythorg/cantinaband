@@ -1,7 +1,5 @@
 import discord
 import logging
-import time
-import threading
 
 secret = r'./private.key'
 with open(secret, 'r') as f:
@@ -29,18 +27,7 @@ async def on_ready():
     guild = await client.fetch_guild(guild_id)
     cantina = await guild.fetch_channel(channel_id)
     voice = await cantina.connect()
-
-    def loop_song():
-        log.info("Started groovin'")
-        while True:
-            voice.play(discord.FFmpegPCMAudio(source="cantinabandloop.mp3"))
-            while voice.is_playing():
-                time.sleep(0.00002083) # 1/48000 to 4.s.f (48khz sample rate)
-                continue
-    async def start_loop():
-        thread = threading.Thread(target=loop_song)
-        thread.start()
-    await start_loop()
+    voice.play(discord.FFmpegPCMAudio("cantinabandloop.opus", before_options="-stream_loop -1"))
 
 @tree.command(
     name = "ping",
